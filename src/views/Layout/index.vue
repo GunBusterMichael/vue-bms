@@ -1,9 +1,19 @@
 <template>
   <div class="layout">
     <!-- 侧边导航栏 -->
-    <side-nav-bar class="sideNavBar"></side-nav-bar>
+    <side-nav-bar
+      class="sideNavBar"
+      :isCollapse="isCollapse"
+    >
+    </side-nav-bar>
     <!-- 右侧内容区 -->
-    <Content class="content"></Content>
+    <Content
+      class="content"
+      @switchCollapse="handleCollapse"
+      :isCollapse="isCollapse"
+      :class="{navCollapse: isCollapse}"
+    >
+    </Content>
   </div>
 </template>
 
@@ -16,6 +26,16 @@
     components: {
       SideNavBar,
       Content
+    },
+    data () {
+      return {
+        isCollapse: false
+      }
+    },
+    methods: {
+      handleCollapse () {
+        this.isCollapse = !this.isCollapse
+      }
     }
   }
 </script>
@@ -26,10 +46,13 @@
     top: 0;
     bottom: 0;
     left: 0;
-    width: 200px;
-    background-color: #666;
+    // width: 200px;
+    background-color: #1b3554;
   }
   .content {
     margin-left: 200px;
+  }
+  .navCollapse {
+    margin-left: 64px;
   }
 </style>

@@ -84,6 +84,10 @@ const routes = [
 
 用 ul 中的 li 包裹 router-link 标签。
 
+##### 9.1.1.2 折叠
+
+通过按钮改变 isCollapse 进行折叠：true——折叠；false——展示。
+
 #### 9.1.2 Order（订单管理）
 
 ##### 9.1.2.1 下拉菜单
