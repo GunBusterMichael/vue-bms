@@ -44,9 +44,11 @@ export default {
   left: 0;
   // width: 200px;
   background-color: #1b3554;
+  z-index: 999;
 }
 .content {
   margin-left: 200px;
+  overflow: hidden;
 }
 .navCollapse {
   margin-left: 64px;

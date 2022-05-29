@@ -24,17 +24,21 @@
         <el-table-column prop="category" label="商品类目" width="100">
         </el-table-column>
         <!-- 没有写宽度的列，会均分剩余宽度 -->
-        <el-table-column prop="image" label="商品图片" show-overflow-tooltip> </el-table-column>
-        <el-table-column prop="sellPoint" label="商品卖点" show-overflow-tooltip> </el-table-column>
-        <el-table-column prop="descs" label="商品描述" show-overflow-tooltip> </el-table-column>
+        <el-table-column prop="image" label="商品图片" show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          prop="sellPoint"
+          label="商品卖点"
+          show-overflow-tooltip
+        >
+        </el-table-column>
+        <el-table-column prop="descs" label="商品描述" show-overflow-tooltip>
+        </el-table-column>
         <el-table-column label="操作" width="180">
           <template slot-scope="scope">
             <!-- scope.$index：当前下标 -->
             <!-- scope.row：当前行数据 -->
-            <el-button
-              size="mini"
-              @click="handleEdit(scope.$index, scope.row)"
-            >
+            <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">
               编辑
             </el-button>
             <el-button
@@ -50,41 +54,60 @@
     </div>
 
     <!-- 分页 -->
-    <!-- <div class="footer">Footer</div> -->
+    <div class="footer">
+      <pagination
+        :total="total"
+        :pageSizes="pageSizes"
+        @changePage="handleChangePage"
+      ></pagination>
+    </div>
   </div>
 </template>
 
 <script>
+import Pagination from "components/Pagination.vue";
+
 export default {
   name: "Goods",
+  components: {
+    Pagination,
+  },
   data() {
     return {
-      input: "",
-      tableData: []
+      input: "", // 用户搜索的内容
+      tableData: [], // 数据的内容
+      total: 0, // 总共有多少条数据
+      pageSizes: 0, // 总共有多少页数据
     };
   },
   methods: {
     /* 编辑当前行 */
-    handleEdit () {
-
-    },
+    handleEdit() {},
     /* 删除当前行 */
-    handleDelete () {
-
+    handleDelete() {},
+    /* 进行网络请求，并将请求到的数据赋值给当前组件的 data */
+    handleHttp(page) {
+      this.$api.getGoodsList({
+        page
+      })
+      .then((res) => {
+        // console.log(res.data)
+        if (res.data.status == 200) {
+          this.tableData = res.data.data;
+          this.total = res.data.total;
+          this.pageSizes = res.data.pageSizes;
+        }
+      });
+    },
+    /* 依据要显示的页面是第几页，获取相对应页的数据 */
+    handleChangePage(page) {
+      this.handleHttp(page)
     }
   },
   /* 生命周期函数 */
-  created () {
-    this.$api.getGoodsList({
-      page: 1
-    })
-    .then(res => {
-      // console.log(res.data)
-      if (res.data.status == 200) {
-        this.tableData = res.data.data
-      }
-    })
-  }
+  created() {
+    this.handleHttp(1)
+  },
 };
 </script>
 
@@ -99,6 +122,10 @@ export default {
   }
   .wrapper {
     margin: 20px 0;
+  }
+  .footer {
+    display: flex;
+    justify-content: center;
   }
 }
 </style>
