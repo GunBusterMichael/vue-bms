@@ -19,5 +19,17 @@ module.exports = {
       .set('views', resolve('src/views'))
       .set('Layout', resolve('src/views/Layout'))
       .set('Login', resolve('src/views/Login'))
+  },
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8989',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+      }
+    }
   }
 }

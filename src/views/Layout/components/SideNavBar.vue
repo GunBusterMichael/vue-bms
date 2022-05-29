@@ -6,8 +6,12 @@
         将按钮变为 router-link。
         每一个按钮的 index 变为要跳转到的路由路径
     -->
+    <!--
+      :default-active="$route.path"
+        让默认高亮的按钮为当前路径所代表的按钮。
+    -->
     <el-menu
-      default-active="/"
+      :default-active="$route.path"
       class="el-menu-vertical-demo"
       background-color="#1b3554"
       text-color="#fff"
@@ -23,20 +27,20 @@
         <i class="el-icon-menu"></i>
         <span slot="title">首页</span>
       </el-menu-item>
-      <el-menu-item index="goods">
+      <el-menu-item index="/goods">
         <i class="el-icon-document"></i>
         <span slot="title">商品管理</span>
       </el-menu-item>
-      <el-menu-item index="params">
+      <el-menu-item index="/params">
         <i class="el-icon-setting"></i>
         <span slot="title">规格参数</span>
       </el-menu-item>
-      <el-menu-item index="advert">
+      <el-menu-item index="/advert">
         <i class="el-icon-setting"></i>
         <span slot="title">广告分类</span>
       </el-menu-item>
       <!-- el-submenu 可下拉的按钮 -->
-      <el-submenu index="order">
+      <el-submenu index="/order">
         <template slot="title">
           <i class="el-icon-location"></i>
           <span>订单管理</span>

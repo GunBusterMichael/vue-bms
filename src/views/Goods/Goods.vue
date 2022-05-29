@@ -9,23 +9,25 @@
 
     <!-- 表格区域展示视图数据 -->
     <div class="wrapper">
+      <!-- 遍历 tableData 的数据来生成表格 -->
       <el-table border :data="tableData" style="width: 100%">
         <el-table-column type="selection" width="55"> </el-table-column>
-        <el-table-column prop="date" label="商品ID" width="100">
+        <!-- 该列中所有表格显示的数据为 tableData.prop -->
+        <el-table-column prop="id" label="商品ID" width="100">
         </el-table-column>
-        <el-table-column prop="name" label="商品名称" width="100">
+        <el-table-column prop="title" label="商品名称" width="100">
         </el-table-column>
-        <el-table-column prop="name" label="商品价格" width="100">
+        <el-table-column prop="price" label="商品价格" width="100">
         </el-table-column>
-        <el-table-column prop="name" label="商品数量" width="100">
+        <el-table-column prop="num" label="商品数量" width="100">
         </el-table-column>
-        <el-table-column prop="name" label="商品类目" width="100">
+        <el-table-column prop="category" label="商品类目" width="100">
         </el-table-column>
         <!-- 没有写宽度的列，会均分剩余宽度 -->
-        <el-table-column prop="name" label="商品图片"> </el-table-column>
-        <el-table-column prop="name" label="商品卖点"> </el-table-column>
-        <el-table-column prop="name" label="商品描述"> </el-table-column>
-        <el-table-column prop="name" label="操作" width="180">
+        <el-table-column prop="image" label="商品图片" show-overflow-tooltip> </el-table-column>
+        <el-table-column prop="sellPoint" label="商品卖点" show-overflow-tooltip> </el-table-column>
+        <el-table-column prop="descs" label="商品描述" show-overflow-tooltip> </el-table-column>
+        <el-table-column label="操作" width="180">
           <template slot-scope="scope">
             <!-- scope.$index：当前下标 -->
             <!-- scope.row：当前行数据 -->
@@ -58,23 +60,7 @@ export default {
   data() {
     return {
       input: "",
-      tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
-        }]
+      tableData: []
     };
   },
   methods: {
@@ -86,6 +72,18 @@ export default {
     handleDelete () {
 
     }
+  },
+  /* 生命周期函数 */
+  created () {
+    this.$api.getGoodsList({
+      page: 1
+    })
+    .then(res => {
+      // console.log(res.data)
+      if (res.data.status == 200) {
+        this.tableData = res.data.data
+      }
+    })
   }
 };
 </script>
