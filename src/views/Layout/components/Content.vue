@@ -1,5 +1,5 @@
 <template>
-  <div style="height:1200px;background-color:pink">
+  <div class="content">
     <div class="header">
       <i v-if="isCollapse" @click="switchCollapse" class="iconfont icon-left-indent"></i>
       <i v-else @click="switchCollapse" class="iconfont icon-right-indent"></i>
@@ -25,6 +25,9 @@
 </script>
 
 <style lang="less" scoped>
+.content {
+  background-color: #ddd;
+  height: 1200px;
   .header {
     height: 50px;
     line-height: 50px;
@@ -35,4 +38,5 @@
       font-size: 20px;
     }
   }
+}
 </style>
