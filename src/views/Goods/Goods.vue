@@ -86,18 +86,15 @@ export default {
     /* 删除当前行 */
     handleDelete() {},
     /* 进行网络请求，并将请求到的数据赋值给当前组件的 data */
-    handleHttp(page) {
-      this.$api.getGoodsList({
+    async handleHttp(page) {
+      const data = await this.$api.getGoodsList({
         page
       })
-      .then((res) => {
-        // console.log(res.data)
-        if (res.data.status == 200) {
-          this.tableData = res.data.data;
-          this.total = res.data.total;
-          this.pageSizes = res.data.pageSizes;
-        }
-      });
+      if (data.status == 200) {
+        this.tableData = data.data;
+        this.total = data.total;
+        this.pageSizes = data.pageSizes;
+      }
     },
     /* 依据要显示的页面是第几页，获取相对应页的数据 */
     handleChangePage(page) {
