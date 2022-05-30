@@ -11,6 +11,7 @@ const Advert = () => import('../views/Advert/Advert.vue')
 const Order = () => import('../views/Order/Order.vue')
 const OrderList = () => import('../views/Order/components/OrderList/OrderList.vue')
 const ReturnOrder = () => import('../views/Order/components/ReturnOrder/ReturnOrder.vue')
+const AddGoods = () => import('../views/Goods/AddGoods/AddGoods.vue')
 
 Vue.use(VueRouter)
 
@@ -30,6 +31,11 @@ const routes = [
         path: 'goods',
         name: 'Goods',
         component: Goods
+      },
+      {
+        path: 'add-goods',
+        name: 'AddGoods',
+        component: AddGoods
       },
       {
         path: 'params',

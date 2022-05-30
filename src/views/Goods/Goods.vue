@@ -5,7 +5,8 @@
       <!-- change 事件：仅在输入框失去焦点或用户按下回车时触发 -->
       <el-input v-model="input" placeholder="请输入内容" @keyup.enter.native="searchInput(input)"></el-input>
       <el-button type="primary" @click="searchInput(input)">查询</el-button>
-      <el-button type="primary">添加</el-button>
+      <el-button type="primary" @click="addGoodsPage">新页面添加</el-button>
+      <el-button type="primary" @click="addGoodsPopup">弹窗添加</el-button>
     </div>
 
     <!-- 表格区域展示视图数据 -->
@@ -86,9 +87,17 @@ export default {
   },
   methods: {
     /* 编辑当前行 */
-    handleEdit() {},
+    handleEdit () {},
     /* 删除当前行 */
-    handleDelete() {},
+    handleDelete () {},
+    /* 在新页面添加商品 */
+    addGoodsPage () {
+      this.$router.push('/add-goods')
+    },
+    /* 在弹窗中添加商品 */
+    addGoodsPopup () {
+      
+    },
     /* 搜索 */
     async searchInput (val) {
       if (val === '') {
@@ -121,6 +130,7 @@ export default {
         page
       })
       if (data.status == 200) {
+        console.log(data.data);
         this.tableData = data.data;
         this.total = data.total;
         this.pageSize = data.pageSize;
