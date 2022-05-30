@@ -2,9 +2,10 @@
   <div class="goods">
     <!-- 搜索区 -->
     <div class="header">
-      <el-input v-model="input" placeholder="请输入内容"></el-input>
-      <el-button type="primary">主要按钮</el-button>
-      <el-button type="primary">主要按钮</el-button>
+      <!-- change 事件：仅在输入框失去焦点或用户按下回车时触发 -->
+      <el-input v-model="input" placeholder="请输入内容" @keyup.enter.native="searchInput(input)"></el-input>
+      <el-button type="primary" @click="searchInput(input)">查询</el-button>
+      <el-button type="primary">添加</el-button>
     </div>
 
     <!-- 表格区域展示视图数据 -->
@@ -57,7 +58,8 @@
     <div class="footer">
       <pagination
         :total="total"
-        :pageSizes="pageSizes"
+        :pageSize="pageSize"
+        :searchRes = 'searchRes'
         @changePage="handleChangePage"
       ></pagination>
     </div>
@@ -77,7 +79,9 @@ export default {
       input: "", // 用户搜索的内容
       tableData: [], // 数据的内容
       total: 0, // 总共有多少条数据
-      pageSizes: 0, // 总共有多少页数据
+      pageSize: 0, // 总共有多少页数据
+      searchRes: [], // 搜索结果（不包含 status）
+      type: 1, // 确定切换页面时，数据的来源：1--后端写了页码的数据；2--后端没有写页码的，搜索到的数据
     };
   },
   methods: {
@@ -85,6 +89,32 @@ export default {
     handleEdit() {},
     /* 删除当前行 */
     handleDelete() {},
+    /* 搜索 */
+    async searchInput (val) {
+      if (val === '') {
+        this.handleHttp(1)
+        this.type = 1
+        this.searchRes = []
+      } else {
+        const data = await this.$api.getSearch({
+          search: val
+        })
+        if (data.status == 200) {
+          this.searchRes = data.result
+          console.log(this.searchRes);
+          this.total = data.result.length
+          this.pageSize = 3
+          this.tableData = this.searchRes.slice(0, 3)
+          this.type = 2
+        } else { // 如果没有搜索到结果
+          this.tableData = []
+          this.searchRes = []
+          this.total = 0
+          this.pageSize = 1
+          this.type = 1
+        }
+      }
+    },
     /* 进行网络请求，并将请求到的数据赋值给当前组件的 data */
     async handleHttp(page) {
       const data = await this.$api.getGoodsList({
@@ -93,12 +123,17 @@ export default {
       if (data.status == 200) {
         this.tableData = data.data;
         this.total = data.total;
-        this.pageSizes = data.pageSizes;
+        this.pageSize = data.pageSize;
+        this.type = 1
       }
     },
     /* 依据要显示的页面是第几页，获取相对应页的数据 */
     handleChangePage(page) {
-      this.handleHttp(page)
+      if (this.type == 1) { // 对有分页的数据进行页面切换
+        this.handleHttp(page)
+      } else { // 对搜索到的，没有分页的数据进行页面切换
+        this.tableData = this.searchRes.slice((page - 1) * 3, page * 3)
+      }
     }
   },
   /* 生命周期函数 */
