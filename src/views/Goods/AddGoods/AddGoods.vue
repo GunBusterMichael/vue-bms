@@ -154,6 +154,9 @@ export default {
     margin-top: 10px;
     border-radius: 5px;
     background-color: #fff;
+    .line {
+      text-align: center;
+    }
   }
 }
 </style>

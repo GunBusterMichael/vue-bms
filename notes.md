@@ -32,6 +32,9 @@ Vue + vue-router + Vuex + Element-ui + Axios + 其他三方库
 ## 6. 后台服务
 
 - npm i express -S
+- node.js
+- jwt（生成token）
+- mysql
 
 ## 7. 组件嵌套
 
@@ -99,3 +102,66 @@ const routes = [
 ##### 9.1.2.1 布局
 
 使用 margin-left: sideNavBar的宽度 将左侧侧边栏的宽度让出来。
+
+#### 9.1.3 上传图片
+
+- element-ui upload 组件；
+- 后台支持上传；
+
+#### 9.14 富文本编辑器
+
+- wangEditor；
+
+- 安装：npm i wangeditor –save
+
+- 引入模块：import E from ‘wangeditor’
+
+- 使用 wangeditor：
+
+  - ```js
+    data() {
+        return {
+          editor: null,
+        };
+      },
+      mounted() {
+        /* 创建 wangEditor 实例 */
+        /* 将 wangEditor 实例保存到 data 中方便使用 */
+        this.editor = new E("#main");
+        this.editor.create();
+      },
+    ```
+
+- 常用配置：
+
+  - 清空编辑器内的内容：
+
+    - ```js
+      editor.txt.clear()
+      ```
+
+  - 设置内容：
+
+    - ```
+      editor.txt.html(‘…’)
+      ```
+
+  - 配置菜单
+
+    - 使用
+
+      ```js
+        editor.config.menus = [
+              'bold',
+              'head',
+              'link',
+              'italic',
+              'underline'
+        ]
+      ```
+
+      定义显示哪些菜单以及定义菜单的显示顺序。
+
+  - 配置 onchange 回调函数：
+
+    - 配置了 onchange 回调函数后，用户操作（鼠标点击、键盘打字等）导致的内容变化后，会自动触发 onchange 函数执行。

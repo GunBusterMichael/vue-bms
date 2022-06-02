@@ -64,16 +64,24 @@
         @changePage="handleChangePage"
       ></pagination>
     </div>
+
+    <!-- 弹窗添加商品 -->
+    <!-- 方法一：父传子，将父组件中控制弹窗开启关闭的数据传给子组件 -->
+    <!-- <goods-dialog :dialogVisible="dialogVisible" @closeDialog="handleCloseDialog"></goods-dialog> -->
+    <!-- 方法二：$ref 获取子组件的值 -->
+    <goods-dialog ref="dialog"></goods-dialog>
   </div>
 </template>
 
 <script>
 import Pagination from "components/Pagination.vue";
+import GoodsDialog from "./AddGoods/GoodsDialog.vue";
 
 export default {
   name: "Goods",
   components: {
     Pagination,
+    GoodsDialog
   },
   data() {
     return {
@@ -83,6 +91,7 @@ export default {
       pageSize: 0, // 总共有多少页数据
       searchRes: [], // 搜索结果（不包含 status）
       type: 1, // 确定切换页面时，数据的来源：1--后端写了页码的数据；2--后端没有写页码的，搜索到的数据
+      // dialogVisible: false // 决定是否显示弹窗
     };
   },
   methods: {
@@ -90,14 +99,20 @@ export default {
     handleEdit () {},
     /* 删除当前行 */
     handleDelete () {},
-    /* 在新页面添加商品 */
+    /* 跳转到新页面添加商品 */
     addGoodsPage () {
       this.$router.push('/add-goods')
     },
-    /* 在弹窗中添加商品 */
+    /* 弹出弹窗，添加商品 */
     addGoodsPopup () {
-      
+      // this.dialogVisible = true
+      this.$refs.dialog.dialogVisible = true
     },
+    /* 关闭弹窗 */
+    // handleCloseDialog (close) {
+    //   /* close === false */
+    //   this.dialogVisible = close
+    // },
     /* 搜索 */
     async searchInput (val) {
       if (val === '') {
@@ -130,7 +145,6 @@ export default {
         page
       })
       if (data.status == 200) {
-        console.log(data.data);
         this.tableData = data.data;
         this.total = data.total;
         this.pageSize = data.pageSize;
