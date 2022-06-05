@@ -1,13 +1,13 @@
-/* 获取商品列表 */
+/* 删除商品 */
 import request from 'network/request'
 import url from 'network/url'
 
-const getGoodsList = function (params) { // {page: xx}
+const getDeleteGoods = function (params) { // {id: xx}
   return request({
     method: 'get',
-    url: url.goodsList,
+    url: url.deleteGoods,
     params
   })
 }
 
-export default getGoodsList
+export default getDeleteGoods

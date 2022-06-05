@@ -1,3 +1,4 @@
+/* 获取商品类别 */
 import request from 'network/request'
 import url from 'network/url'
 

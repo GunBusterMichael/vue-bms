@@ -3,7 +3,11 @@
     <!-- 搜索区 -->
     <div class="header">
       <!-- change 事件：仅在输入框失去焦点或用户按下回车时触发 -->
-      <el-input v-model="input" placeholder="请输入内容" @keyup.enter.native="searchInput(input)"></el-input>
+      <el-input
+        v-model="input"
+        placeholder="请输入内容"
+        @keyup.enter.native="searchInput(input)"
+      ></el-input>
       <el-button type="primary" @click="searchInput(input)">查询</el-button>
       <el-button type="primary" @click="addGoodsPage">新页面添加</el-button>
       <el-button type="primary" @click="addGoodsPopup">弹窗添加</el-button>
@@ -48,6 +52,8 @@
               type="danger"
               @click="handleDelete(scope.$index, scope.row)"
             >
+              <!-- scope.$index：当前行下标 -->
+              <!-- scope.row：当前行 -->
               删除
             </el-button>
           </template>
@@ -60,7 +66,7 @@
       <pagination
         :total="total"
         :pageSize="pageSize"
-        :searchRes = 'searchRes'
+        :searchRes="searchRes"
         @changePage="handleChangePage"
       ></pagination>
     </div>
@@ -81,7 +87,7 @@ export default {
   name: "Goods",
   components: {
     Pagination,
-    GoodsDialog
+    GoodsDialog,
   },
   data() {
     return {
@@ -96,17 +102,44 @@ export default {
   },
   methods: {
     /* 编辑当前行 */
-    handleEdit () {},
+    handleEdit() {},
     /* 删除当前行 */
-    handleDelete () {},
+    async handleDelete(index, row) {
+      // console.log(index);
+      // console.log(row);
+      this.$confirm("此操作将永久删除该商品, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          /* 点击确定后，调用删除商品接口 */
+          this.$api.getDeleteGoods({id: row.id})
+            .then((res) => {
+              if (res.status === 200) {
+                this.$message({
+                  type: "success",
+                  message: "删除成功!",
+                });
+                this.handleHttp(1)
+              }
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
     /* 跳转到新页面添加商品 */
-    addGoodsPage () {
-      this.$router.push('/add-goods')
+    addGoodsPage() {
+      this.$router.push("/add-goods");
     },
     /* 弹出弹窗，添加商品 */
-    addGoodsPopup () {
+    addGoodsPopup() {
       // this.dialogVisible = true
-      this.$refs.dialog.dialogVisible = true
+      this.$refs.dialog.dialogVisible = true;
     },
     /* 关闭弹窗 */
     // handleCloseDialog (close) {
@@ -114,55 +147,57 @@ export default {
     //   this.dialogVisible = close
     // },
     /* 搜索 */
-    async searchInput (val) {
-      if (val === '') {
-        this.handleHttp(1)
-        this.type = 1
-        this.searchRes = []
+    async searchInput(val) {
+      if (val === "") {
+        this.handleHttp(1);
+        this.type = 1;
+        this.searchRes = [];
       } else {
         const data = await this.$api.getSearch({
-          search: val
-        })
+          search: val,
+        });
         if (data.status == 200) {
-          this.searchRes = data.result
-          console.log(this.searchRes);
-          this.total = data.result.length
-          this.pageSize = 3
-          this.tableData = this.searchRes.slice(0, 3)
-          this.type = 2
-        } else { // 如果没有搜索到结果
-          this.tableData = []
-          this.searchRes = []
-          this.total = 0
-          this.pageSize = 1
-          this.type = 1
+          this.searchRes = data.result;
+          this.total = data.result.length;
+          this.pageSize = 3;
+          this.tableData = this.searchRes.slice(0, 3);
+          this.type = 2;
+        } else {
+          // 如果没有搜索到结果
+          this.tableData = [];
+          this.searchRes = [];
+          this.total = 0;
+          this.pageSize = 1;
+          this.type = 1;
         }
       }
     },
     /* 进行网络请求，并将请求到的数据赋值给当前组件的 data */
     async handleHttp(page) {
       const data = await this.$api.getGoodsList({
-        page
-      })
+        page,
+      });
       if (data.status == 200) {
         this.tableData = data.data;
         this.total = data.total;
         this.pageSize = data.pageSize;
-        this.type = 1
+        this.type = 1;
       }
     },
     /* 依据要显示的页面是第几页，获取相对应页的数据 */
     handleChangePage(page) {
-      if (this.type == 1) { // 对有分页的数据进行页面切换
-        this.handleHttp(page)
-      } else { // 对搜索到的，没有分页的数据进行页面切换
-        this.tableData = this.searchRes.slice((page - 1) * 3, page * 3)
+      if (this.type == 1) {
+        // 对有分页的数据进行页面切换
+        this.handleHttp(page);
+      } else {
+        // 对搜索到的，没有分页的数据进行页面切换
+        this.tableData = this.searchRes.slice((page - 1) * 3, page * 3);
       }
-    }
+    },
   },
   /* 生命周期函数 */
   created() {
-    this.handleHttp(1)
+    this.handleHttp(1);
   },
 };
 </script>

@@ -10,7 +10,7 @@
           label-width="100px"
           class="demo-goodsForm"
         >
-          <el-form-item label="类目选择" prop="category">
+          <el-form-item label="商品类目" prop="category" required>
             <el-button type="primary" @click="openCategory">类目选择</el-button>
             <span class="categoryRes">{{ showCategory }}</span>
           </el-form-item>
@@ -51,7 +51,7 @@
           </el-form-item>
 
           <el-form-item label="商品图片" prop="images">
-            <el-button type="primary" @click="openImg">上传图片</el-button>
+            <!-- <el-button type="primary" @click="openImg">上传图片</el-button>
             <div class="imgs-wrapper">
               <img
                 v-for="item in goodsForm.images"
@@ -59,12 +59,16 @@
                 :src="item"
                 alt=""
               />
-            </div>
+            </div> -->
+            <upload-imgs ref="imgs" @subForm="submitForm"></upload-imgs>
           </el-form-item>
 
           <el-form-item label="商品描述" prop="descs">
             <!-- <el-input type="textarea" v-model="goodsForm.descs"></el-input> -->
-            <wang-editor @emitEditorContent="handleEditorContent"></wang-editor>
+            <wang-editor
+              ref="wangEditor"
+              @emitEditorContent="handleEditorContent"
+            ></wang-editor>
           </el-form-item>
         </el-form>
       </div>
@@ -72,7 +76,8 @@
       <!-- 底部弹窗区域 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="warning" @click="handleClickReset">清 空</el-button>
+        <el-button type="primary" @click="handleUploadImgs">确 定</el-button>
       </span>
 
       <!-- 内弹窗-类目选择 -->
@@ -82,11 +87,11 @@
       ></category-inner-dialog>
 
       <!-- 内弹窗-上传图片 -->
-      <img-inner-dialog
+      <!-- <img-inner-dialog
         ref="imgInnerDialog"
         @emitImgUrls="handleEmitImgUrls"
         @showImg="handleShowImg"
-      ></img-inner-dialog>
+      ></img-inner-dialog> -->
     </el-dialog>
   </div>
 </template>
@@ -94,6 +99,7 @@
 <script>
 import CategoryInnerDialog from "./CategoryInnerDialog.vue";
 import ImgInnerDialog from "./ImgInnerDialog.vue";
+import uploadImgs from "./uploadImgs.vue";
 import WangEditor from "./WangEditor.vue";
 
 export default {
@@ -101,6 +107,7 @@ export default {
   components: {
     CategoryInnerDialog,
     ImgInnerDialog,
+    uploadImgs,
     WangEditor,
   },
   data() {
@@ -108,13 +115,13 @@ export default {
       dialogVisible: false,
       categoryFullData: {},
       imagesCache: [],
-      isHiddenDeleteImgButton: [],
       // hiddenButton: {
       //   display: 'hidden'
       // },
       goodsForm: {
         // 表单双向绑定的数据
         category: "",
+        cid: "",
         title: "",
         price: "",
         num: "",
@@ -129,6 +136,9 @@ export default {
         title: [
           { required: true, message: "请输入商品名称", trigger: "blur" },
           { min: 2, max: 8, message: "长度在 2 到 8 个字符", trigger: "blur" },
+        ],
+        category: [
+          { required: true, message: "请选择商品类目", trigger: "blur" },
         ],
         price: [
           { required: true, message: "请输入商品价格", trigger: "blur" },
@@ -183,39 +193,117 @@ export default {
     openImg() {
       this.$refs.imgInnerDialog.innerVisible = true;
     },
+    /* 接收商品类目数据 */
     handleEmitCategory(val) {
       this.categoryFullData = val;
       this.goodsForm.category = val.name;
+      this.goodsForm.cid = val.cid;
     },
-    handleEmitImgUrls(imgUrls) {
-      // this.goodsForm.images = imgUrls
-      this.imagesCache = imgUrls;
-      this.imagesCache.forEach(() => {
-        this.isHiddenDeleteImgButton.push(true);
-      });
-      console.log(this.isHiddenDeleteImgButton);
-    },
-    handleShowImg() {
-      this.goodsForm.images = this.imagesCache;
-    },
-    showDeleteImg(index) {
-      this.isHiddenDeleteImgButton[index] = false;
-    },
+    // handleEmitImgUrls(imgUrls) {
+    //   // this.goodsForm.images = imgUrls
+    //   this.imagesCache = imgUrls;
+    //   this.imagesCache.forEach(() => {
+    //     this.isHiddenDeleteImgButton.push(true);
+    //   });
+    //   console.log(this.isHiddenDeleteImgButton);
+    // },
+    // handleShowImg() {
+    //   this.goodsForm.images = this.imagesCache;
+    // },
     handleEditorContent(newHTML) {
       this.goodsForm.descs = newHTML;
     },
+    /* 上传图片或提交表单 */
+    handleUploadImgs () {
+      if (this.$refs.imgs.newFileList.length > 0) {
+        this.$refs.imgs.submitUpload()
+      } else {
+        this.submitForm()
+      }
+    },
+    /* 添加商品 */
+    async handleAddGoods() {
+      if (this.goodsForm.images == this.$refs.imgs.imgUrls) {
+        this.goodsForm.images = []
+      } else {
+        this.goodsForm.images = this.$refs.imgs.imgUrls
+      }
+      console.log(this.goodsForm.images);
+      /* 参数：title cid category sellPoint price num descs paramsInfo images */
+      let {
+        title,
+        cid,
+        category,
+        sellPoint,
+        price,
+        num,
+        descs,
+        paramsInfo,
+        images,
+      } = this.goodsForm; // 声明了变量：title, cid, category, sellPoint, price, num, descs, paramsInfo, images
+      const res = await this.$api.getAddGoods({
+        title,
+        cid,
+        category,
+        sellPoint,
+        price,
+        num,
+        descs,
+        paramsInfo,
+        images,
+      });
+      console.log(res); // {status: 200, msg: '添加成功'}
+      /* res.status = 200 说明数据上传成功 */
+      if (res.status = 200) {
+        this.dialogVisible = false; // 关闭弹窗
+        this.$parent.handleHttp(1); // 调用父组件的“获取列表数据”函数，刷新第一页的数据
+        this.$message({
+          // 提示商品添加成功
+          message: "添加商品成功",
+          type: "success",
+        });
+        this.resetForm(); // 清空当前表单
+      } else {
+        this.$message.error("添加商品失败");
+      }
+    },
+    /* 提交表单 */
     submitForm() {
       this.$refs.ruleForm.validate((valid) => {
+        /* 如果输入的数据符合要求，则向后台传递商品参数 */
         if (valid) {
           console.log("输入的信息：", this.goodsForm);
+          this.handleAddGoods();
         } else {
-          console.log("error submit!!");
+          this.$message.error("您有必填项未填写");
           return false;
         }
       });
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+    resetForm() {
+      this.$refs.ruleForm.resetFields(); // 清空表单
+      this.$refs.wangEditor.editor.txt.clear(); // 清空富文本编辑器内容
+      this.$refs.imgs.clearAllImgs() // 清空图片
+    },
+    handleClickReset() {
+      this.$confirm("此操作将清空已输入内容，是否继续？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.resetForm();
+          this.$message({
+            type: "success",
+            message: "清空成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消清空",
+          });
+        });
     },
   },
 };
